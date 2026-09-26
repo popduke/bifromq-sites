@@ -38,7 +38,15 @@ Channels have independent state and can execute concurrently. After initializati
 
 ## Events and payloads
 
-A Source event has `type = "source"`, a timestamp and `payload`. A timer event has `type = "timer"`, a timestamp and no payload. Events and nested payload values are deeply read-only; modifying them is a sandbox violation.
+| Field | Source event | Timer event |
+| --- | --- | --- |
+| `type` | `"source"` | `"timer"` |
+| `timestamp` | Dispatch time, in integer milliseconds since Pipeline startup | Dispatch time, on the same timeline |
+| `payload` | Read-only Source payload | Absent (`nil`) |
+| `id` | Absent (`nil`) | Timer name (string), or `nil` for the anonymous timer |
+| `eligibleAt` | Absent (`nil`) | Scheduled deadline, in integer milliseconds since Pipeline startup |
+
+Events and nested payload values are deeply read-only; modifying them is a sandbox violation.
 
 `event.timestamp` is a monotonic integer millisecond count since Pipeline startup, sampled when the channel dispatches the event. It is not Unix time. Use the wall-clock functions below for a real-world date or timestamp.
 
@@ -127,25 +135,31 @@ Registry lookup, Builder receiver/argument/type/range errors and timer argument 
 
 ## Timers and state
 
-Each VM has one one-shot timer slot:
-
-```lua
-setTimeout(durationMs)
-clearTimerTask()
-hasTimeout()
-```
+Each VM has an anonymous one-shot timer slot plus independently named one-shot timers. Omitting `id` or passing `nil` selects the anonymous timer. In the signatures below, brackets mark an optional argument.
 
 | Timer operation | Effect |
 | --- | --- |
-| `setTimeout(durationMs)` | Starts a delay from this call; replaces the pending timer |
-| `clearTimerTask()` | Removes the pending timer; succeeds even when none exists |
-| `hasTimeout()` | Immediately reports whether a timer is pending |
+| `setTimeout(durationMs [, id])` | Starts a delay from this call; replaces only the pending timer with the same id |
+| `clearTimeout([id])` | Removes the selected timer; succeeds even when none exists; returns no values |
+| `hasTimeout([id])` | Immediately returns whether the selected timer is pending |
 
-Use a nonnegative Lua integer delay. The timer slot is removed before its event enters `main`; it stays empty unless you schedule another timer.
+Use a nonnegative Lua integer delay. The maximum Lua integer is `9223372036854775807`; the delay must also fit the monotonic deadline and `eligibleAt` calculation. A timer is removed before its event enters `main`, so `hasTimeout` returns false for that id unless you schedule another timer. Different ids remain independent. A timer id must be a non-empty UTF-8 string of at most 128 bytes.
 
-These functions are allowed at top level and in `main`. A zero delay schedules eligibility on the next event-loop iteration. Execution may be later because the channel is busy. Periodic behavior explicitly schedules the next one-shot timer from the current timer event. Invalid delays raise `setTimeout delay must be a non-negative integer`.
+These functions are allowed at top level and in `main`. A zero delay schedules eligibility on the next event-loop iteration. Execution may be later because the channel is busy. Periodic behavior explicitly schedules the next one-shot timer from the current timer event.
 
-Lua state, Builders, snapshots and timers count toward the VM's memory allowance. Top-level initialization and each `main` invocation are bounded by the Runner's Lua CPU limit. State lives only in the current VM. A script/resource/sandbox failure invalidates the VM and its timers; rebuilding executes top-level code again. Relevant Tenon Document updates and process restarts also recreate state. Script replacement can briefly hold both old and new VMs, each with its own configured allowance.
+Timer argument errors are catchable with `pcall`:
+
+| Invalid argument | Error |
+| --- | --- |
+| Negative, non-integer, string, or missing delay | `setTimeout delay must be a non-negative integer` |
+| Delay that overflows conversion, the monotonic deadline, or `eligibleAt` | `setTimeout delay is out of range` |
+| Empty, non-string, invalid UTF-8, or longer-than-128-byte id | `timer id must be a non-empty string of at most 128 bytes` |
+
+`event.eligibleAt` is the timer's deadline on the same monotonic timeline as `event.timestamp`. The difference `event.timestamp - event.eligibleAt` is its dispatch delay. Timers with the same deadline run in registration order. Among due timers and readable Source input, the earlier deadline or first observed Source readiness runs first; ties use their registration or observation order. Source readiness keeps its place until one record is consumed, so a timer that repeatedly reschedules itself with zero delay cannot indefinitely prevent readable Source input from running. Sink backpressure and lifecycle work can still delay either kind of event.
+
+Named timers share the VM's batch completion behavior: the first successful `emit` in an event can complete all pending Source records in that VM. A timer id does not provide independent reliable completion for records with that key.
+
+Lua state, Builders, snapshots and timers count toward the VM's memory allowance. Each pending timer is charged 2 KiB plus three times its id length in UTF-8 bytes (zero id bytes for the anonymous timer). The fixed charge includes an allowance for the timer and its indexes; it is an estimate, not an exact allocation or process-memory measurement. There is no separate timer-count limit. Exhausting the memory allowance invalidates the VM and cannot be recovered with `pcall`. Top-level initialization and each `main` invocation are bounded by the Runner's Lua CPU limit. State lives only in the current VM. A script/resource/sandbox failure invalidates the VM and its timers; rebuilding executes top-level code again. Relevant Tenon Document updates and process restarts also recreate state. Script replacement can briefly hold both old and new VMs, each with its own configured allowance.
 
 ## Wall-clock time and dates
 
