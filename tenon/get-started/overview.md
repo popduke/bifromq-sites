@@ -10,6 +10,8 @@ import {TenonOverviewDiagram} from '@site/src/components/TenonDiagrams';
 
 Tenon is a standalone runner for connecting systems with typed Source and Sink plugins. A user describes one pipeline in a Tenon Document. The Runner reads that Tenon Document, starts the requested plugin Programs, and applies the Lua processing that connects Sources to Sinks.
 
+Lua uses the [Event-Driven Stateful Transducer](/tenon/docs/development/reference/lua/#event-driven-stateful-transducer) model. Each Flow Channel reacts to Source and timer events, maintains private in-memory state when needed, and produces effects such as Sink output or scheduling another timer. Pure filtering and mapping also fit this model.
+
 <TenonOverviewDiagram />
 
 ## The four pieces

@@ -88,7 +88,7 @@ See [First Pipeline](/tenon/docs/development/get-started/first-pipeline/) for th
 
 ## Channels and limits
 
-A channel processes events in order, with its own Lua state and timers. Channels run independently; they do not share Lua globals or ordering.
+A channel runs Lua as an [Event-Driven Stateful Transducer](/tenon/docs/development/reference/lua/#event-driven-stateful-transducer): it serially consumes Source and timer events, maintains private in-memory state, and requests output or timer effects. Channels run independently; they do not share Lua globals or ordering.
 
 | Flow setting | Default | Use it to |
 | --- | --- | --- |

@@ -1,12 +1,14 @@
 ---
 title: Lua Processing
 sidebar_position: 2
-description: Filter, transform, route, and schedule Tenon records with Lua.
+description: Use Tenon Lua as an Event-Driven Stateful Transducer to react to events, maintain state, and produce effects.
 ---
 
 # Lua processing
 
-A Flow uses `function main(event)` to process input or react to a timer. Each channel has its own Lua state.
+Tenon Lua uses the **Event-Driven Stateful Transducer** model. Each Flow Channel runs a computation that lives across events: `main(event)` handles one event at a time, updates private in-memory state, and requests effects such as output or timer scheduling. A timer can produce a future event for the same channel.
+
+Conceptually: `(state, event) → (next state, effects)`. Your script updates variables and calls APIs directly. Pure filters and mappings need no state between events; aggregation, debouncing, and other stateful behavior can retain it. State and timers live only in the current VM. Outputs and Source completion follow their existing delivery rules; a `main` call is not a transaction. See the [processing model](/tenon/docs/development/reference/lua/#event-driven-stateful-transducer).
 
 | Event | Check | Available input |
 | --- | --- | --- |
