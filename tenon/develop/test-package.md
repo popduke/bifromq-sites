@@ -14,4 +14,4 @@ Start with focused language tests, then run the standard bundle command. The mea
 4. Exercise malformed configuration, unavailable external services, retry or replay, and normal shutdown.
 5. Remove the Tenon Document with its current ETag and confirm the plugin process exits.
 
-Keep license and notice files in the bundle. Record the source commit, target platform, exact Program version, and evidence in the plugin README. See the [repository verification guide](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/CONTRIBUTING.md) for the shared checks.
+Keep license and notice files in the bundle. Record the source commit, target platform, exact Program version, and evidence in the plugin README. See the [repository verification guide](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/CONTRIBUTING.md) for the shared checks.

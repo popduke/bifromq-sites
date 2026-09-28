@@ -1,6 +1,6 @@
 export const tenonSource = {
   repository: 'https://github.com/apache/bifromq-tenon',
-  commit: '21452dc53be3491567dbe9958294e34bf0fc79f5',
+  commit: 'd1848739c16373f5a150258fccd4475c0ef67992',
 };
 
 export const tenonDocsBase = '/tenon/docs/development';

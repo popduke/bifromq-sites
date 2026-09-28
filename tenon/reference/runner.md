@@ -110,7 +110,7 @@ Set CPU and memory limits in each [Tenon Document](/tenon/docs/development/user-
 
 ### Host deployment
 
-Use the supplied [systemd unit](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/deploy/systemd/tenon.service) with systemd 251 or newer:
+Use the supplied [systemd unit](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/deploy/systemd/tenon.service) with systemd 251 or newer:
 
 1. Create the `tenon` user and group.
 2. Install the binary and configuration at the paths specified in the unit. Set `stateDirectory` to `/var/lib/tenon`.
@@ -130,7 +130,7 @@ systemd-run --user --scope -p 'Delegate=cpu memory' \
 
 ### Container deployment
 
-Use the [Docker Compose configuration or Podman instructions](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/deploy/container/README.md). Give each Runner its own container and state volume. The runtime must supply a private cgroup namespace and permission to manage it. The supplied configurations support a container init with Tenon as its direct child.
+Use the [Docker Compose configuration or Podman instructions](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/deploy/container/README.md). Give each Runner its own container and state volume. The runtime must supply a private cgroup namespace and permission to manage it. The supplied configurations support a container init with Tenon as its direct child.
 
 ### Enforcement and troubleshooting
 

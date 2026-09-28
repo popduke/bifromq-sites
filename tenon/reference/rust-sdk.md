@@ -136,7 +136,7 @@ fn main() {
 }
 ```
 
-The shared factory and `start` each run once. Flow bindings determine which directions are active. The factory receives `Option<Ingress<S>>` and the actual `BTreeSet<FlowChannel>` Sink inputs. A combined Program can run Source-only, Sink-only, or both; unbound directions have no queues or SDK workers. `FlowChannel` contains only the Flow id and channel id; Bell paths remain inside the SDK.
+The shared factory and `start` each run once. Runner activates each direction from the current Flow bindings. The factory receives `Option<Ingress<S>>` and the actual `BTreeSet<FlowChannel>` Sink inputs, so the same Program can run Source-only, Sink-only, or in both directions. An unbound direction has no queues or SDK workers. `FlowChannel` contains only the Flow id and channel id.
 
 Quiescing stops only Source production; Sink writes and Source results can still use the shared connection. Final shutdown resolves Source results, stops Sink workers, then closes the shared object once. For example, a device can stop publishing events while still receiving the final commands through the same connection.
 
@@ -147,3 +147,7 @@ During Source quiesce, new sends are rejected and `quiesce` must stop production
 Final shutdown preserves results already read, fails remaining requests, and calls `close` after successful SDK cleanup. Business `close` must return promptly without waiting for worker termination or remote acknowledgements. Tenon may forcibly terminate a plugin that exceeds its shutdown deadline.
 
 Factory, lifecycle, queue, write and shutdown failures are reported on stderr and exit the process with code 1. Panics on business threads do the same. Neither `run` nor `await_shutdown` returns an error to the author. Dropping a Program before shutdown completes also exits with failure. Do not depend on later callbacks or destructors after a failure; use these entrypoints in a process dedicated to the plugin.
+
+## Built-in process observations
+
+To implement the SDK process-metrics contract, this SDK automatically reports this Plugin process's CPU consumption (`tenon.plugin.cpu`, logical cores) and current RSS (`tenon.plugin.memory`, bytes) when the Runner receives a metrics request. A combined Source-and-Sink owner reports one process. The first CPU observation is absent while its baseline is established; missing observations are never zero. Authors do not add instrumentation or a collector. Lifecycle and Queue operations are independent of metrics collection. The reusable `tenon-process-metrics` crate supplies OS observations to both core and this SDK; IPC primitives remain independent of metrics.

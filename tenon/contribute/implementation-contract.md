@@ -31,7 +31,8 @@ A language SDK lets plugin authors focus on their external system. It handles co
 
 | Component | Responsibility |
 | --- | --- |
-| SDK | Tenon communication, lifecycle, bounded submission, and completion results |
+| Process sampling module | Own-process CPU and RSS with the same sampling meaning across languages |
+| SDK | Tenon communication, lifecycle, bounded submission, completion results, and publishing process observations through its private OpenTelemetry SDK |
 | Plugin | External clients, business configuration, payload meaning, and external acknowledgement or replay |
 | Scaffold and bundler | A usable starter project and an installable plugin bundle |
 
@@ -40,15 +41,17 @@ Use APIs that fit the language while preserving Tenon's behavior. Different call
 ## Approach the work
 
 1. Read the shared contract and compare the existing Rust and Java implementations.
-2. Establish the [IPC integration](/tenon/docs/development/contribute/ipc/) for the target language.
-3. Support Source, Sink, and combined plugins with a clear lifecycle for each.
-4. Verify behavior through generated plugins and a real Runner, including failure and shutdown.
+2. Establish the [IPC integration](/tenon/docs/development/contribute/ipc/) and an independently reusable `sdk/<language>/process-metrics` package. Keep OS sampling independent of OpenTelemetry and transport; the language SDK uses the sampler and owns metric publication.
+3. Support Source, Sink, and combined plugins with a clear lifecycle for each. Implement request-driven CPU and RSS reporting through the SDK metrics protocol, independently of business lifecycle and Queues.
+4. Verify behavior through generated plugins and a real Runner, including first CPU samples, missing observations, metrics reconnection, process restarts, failure and shutdown.
+
+These requirements apply to every SDK. The currently available Java and Rust SDKs and scaffolds implement them; a Plugin author does not add instrumentation or install another collector.
 
 ## Implementation details
 
 Use the code repository for protocol fields, callback rules, ownership, and compatibility requirements:
 
-- [SDK implementation contract](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/sdk/SDK-impl-contract.md) — shared behavior across languages.
-- [Rust SDK](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/sdk/rust/plugin-sdk/README.md) — the Rust API and implementation entry point.
-- [Java SDK](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/sdk/java/README.md) — the Java API and implementation entry point.
-- [Verification instructions](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/CONTRIBUTING.md) — toolchains and checks for a contribution.
+- [SDK implementation contract](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/sdk/plugin-sdk-contract.md) — shared behavior across languages.
+- [Rust SDK](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/sdk/rust/plugin-sdk/README.md) — the Rust API and implementation entry point.
+- [Java SDK](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/sdk/java/README.md) — the Java API and implementation entry point.
+- [Verification instructions](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/CONTRIBUTING.md) — toolchains and checks for a contribution.

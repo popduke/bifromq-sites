@@ -47,9 +47,9 @@ Use the repository's pinned toolchains and verification commands. Start with foc
 
 ## Repository instructions
 
-- [Contributing](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/CONTRIBUTING.md) — setup, coding conventions, and verification commands.
-- [SDK contract](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/sdk/SDK-impl-contract.md) — SDK and generated-project acceptance requirements.
-- [IPC contract](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/ipc/README.md) — protocol and cross-process checks.
-- [CI configuration](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/.github/workflows/ci.yml) — the project's automated platform checks.
+- [Contributing](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/CONTRIBUTING.md) — setup, coding conventions, and verification commands.
+- [SDK contract](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/sdk/plugin-sdk-contract.md) — SDK and generated-project acceptance requirements.
+- [IPC contract](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/ipc/README.md) — protocol and cross-process checks.
+- [CI configuration](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/.github/workflows/ci.yml) — the project's automated platform checks.
 
 Submit the change to [apache/bifromq-tenon](https://github.com/apache/bifromq-tenon/pulls).

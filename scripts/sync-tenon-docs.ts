@@ -6,9 +6,10 @@ import { tenonDocsBase, tenonGuidePages, tenonImports, tenonSource, type TenonIm
 
 const args = process.argv.slice(2);
 const check = args.includes('--check');
+const workingTree = args.includes('--working-tree');
 const checkout = args.find((arg) => !arg.startsWith('--'));
-if (!checkout || args.some((arg) => arg.startsWith('--') && arg !== '--check')) {
-  throw new Error('Usage: pnpm sync:tenon /path/to/bifromq-tenon [--check]');
+if (!checkout || args.some((arg) => arg.startsWith('--') && arg !== '--check' && arg !== '--working-tree')) {
+  throw new Error('Usage: pnpm sync:tenon /path/to/bifromq-tenon [--check] [--working-tree]');
 }
 const siteRoot = path.resolve(__dirname, '..');
 const sourceRoot = path.resolve(checkout);
@@ -21,7 +22,11 @@ function sourceUrl(file: string): string {
 
 function verifySource(file: string): void {
   if (verifiedPaths.has(file)) return;
-  execFileSync('git', ['-C', sourceRoot, 'cat-file', '-e', `${tenonSource.commit}:${file}`], { stdio: 'pipe' });
+  if (workingTree) {
+    if (!existsSync(path.join(sourceRoot, file))) throw new Error(`Missing local source: ${file}`);
+  } else {
+    execFileSync('git', ['-C', sourceRoot, 'cat-file', '-e', `${tenonSource.commit}:${file}`], { stdio: 'pipe' });
+  }
   verifiedPaths.add(file);
 }
 
@@ -48,7 +53,7 @@ function rewriteTarget(target: string, source: string, image: boolean): string {
 }
 
 function render(entry: TenonImport): string {
-  let body = execFileSync('git', ['-C', sourceRoot, 'show', `${tenonSource.commit}:${entry.source}`], { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
+  let body = workingTree ? readFileSync(path.join(sourceRoot, entry.source), 'utf8') : execFileSync('git', ['-C', sourceRoot, 'show', `${tenonSource.commit}:${entry.source}`], { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
   if (entry.startHeading) {
     const start = body.indexOf(`\n${entry.startHeading}\n`);
     const end = entry.endHeading ? body.indexOf(`\n${entry.endHeading}\n`, start + 1) : body.length;
@@ -79,7 +84,7 @@ function render(entry: TenonImport): string {
           `${prefix}${rewriteTarget(target, entry.source, false)}`);
     }).join('\n');
   }
-  return `---\ntitle: ${JSON.stringify(entry.title)}\ndescription: ${JSON.stringify(entry.description)}\nmdx:\n  format: md\n---\n\n${body.trim()}\n`;
+  return `---\ntitle: ${JSON.stringify(entry.title)}\ndescription: ${JSON.stringify(entry.description)}\nmdx:\n  format: md\n---\n\n${workingTree ? '<!-- Local working-tree preview. Update the source pin and regenerate before publishing. -->\n\n' : ''}${body.trim()}\n`;
 }
 
 const stale: string[] = [];
@@ -94,4 +99,4 @@ for (const entry of tenonImports) {
   }
 }
 if (stale.length) throw new Error(`Tenon imports differ from the pinned source: ${stale.join(', ')}`);
-console.log(`${check ? 'Verified' : 'Imported'} ${tenonImports.length} Tenon documents at ${tenonSource.commit}.`);
+console.log(`${check ? 'Verified' : 'Imported'} ${tenonImports.length} Tenon documents at ${workingTree ? 'local working-tree preview' : tenonSource.commit}.`);

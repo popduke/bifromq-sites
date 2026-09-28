@@ -90,7 +90,7 @@ Tenon Document validation checks structure and supported semantics; it does not 
 
 Protect runtime directories from other users. Local process communication does not isolate a plugin from other processes running under the same OS identity.
 
-See [package rules](/tenon/docs/development/reference/plugin-packages/) for installation requirements. SDK developers should also follow the [SDK implementation contract](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/sdk/SDK-impl-contract.md).
+See [package rules](/tenon/docs/development/reference/plugin-packages/) for installation requirements. SDK developers should also follow the [SDK implementation contract](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/sdk/plugin-sdk-contract.md).
 
 ## Lua and resource boundaries
 
@@ -98,7 +98,7 @@ Lua has a restricted language environment inside each Flow Channel. It exposes t
 
 Lua scripts can transform or discard data, send to configured Sinks and reveal data through diagnostics. Only trusted operators should be allowed to submit Tenon Documents, which also control native plugin execution.
 
-Linux Tenon Document CPU and memory limits require delegated cgroup v2 support. On macOS, these limits are ignored and execution continues. Per-VM and per-Flow limits do not impose a total node budget. See [resource enforcement](/tenon/docs/development/reference/runner/#cpu-and-memory). The supplied [Docker configuration](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/deploy/container/README.md) grants `CAP_SYS_ADMIN` for cgroup management. That broad capability is inherited by child programs; use trusted plugins and retain container security policies.
+Linux Tenon Document CPU and memory limits require delegated cgroup v2 support. On macOS, these limits are ignored and execution continues. Per-VM and per-Flow limits do not impose a total node budget. See [resource enforcement](/tenon/docs/development/reference/runner/#cpu-and-memory). The supplied [Docker configuration](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/deploy/container/README.md) grants `CAP_SYS_ADMIN` for cgroup management. That broad capability is inherited by child programs; use trusted plugins and retain container security policies.
 
 The HTTP API has no total Tenon Document or compressed-upload byte limit and no built-in per-principal rate or execution quota policy. Archive extraction has separate fixed bounds, which do not bound aggregate concurrent uploads, retained installations or all management costs. Deployers must set request size, rate, connection, execution, disk and resource budgets appropriate to their environment and protect the listener against network exhaustion. A TLS handshake deadline is not general denial-of-service protection.
 

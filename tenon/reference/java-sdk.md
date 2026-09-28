@@ -49,6 +49,14 @@ An invalid channel throws `IllegalArgumentException`. A closed session completes
 
 Sink `write` receives a nonempty, ordered, immutable batch and returns `CompletionStage<Void>`. Calls do not overlap, but returned stages can finish out of order. Return promptly and complete the stage successfully only when every record reaches your downstream delivery guarantee. A failed stage terminates the plugin; a restart can replay unacknowledged batches, including partial external effects. Plan for duplicates.
 
-## Direction bindings
+## Combined Programs
 
-A combined Program may run as Source only, Sink only, or both. Its factory receives `Optional<Ingress<S>> source` and the actual `Set<FlowChannel> egressChannels`. `Ingress<S>` contains the Source channel count and its `PayloadSender<S>`; an empty optional means Source is not bound. An empty channel set means Sink is not bound. The SDK opens queues and runs workers only for bound directions. `FlowChannel` contains only `flowId` and `channelId`; Bell paths remain inside the SDK. Existing combined plugins must adapt their factory and rebuild against this SDK.
+A combined Program may be bound as Source only, Sink only, or both. The SDK creates only the sessions represented by the current Flow bindings. Its factory receives `Optional<Ingress<S>>` for the bound Source direction and the actual `Set<FlowChannel>` Sink inputs. `FlowChannel` contains only `flowId` and `channelId`.
+
+Unbound directions do not create workers.
+
+## Built-in process observations
+
+To implement the SDK process-metrics contract, this SDK automatically reports this Plugin process's CPU consumption (`tenon.plugin.cpu`, logical cores) and current RSS (`tenon.plugin.memory`, bytes) when the Runner receives a metrics request. A combined Source-and-Sink owner reports one process. The first CPU observation is absent while its baseline is established; missing observations are never zero. Authors do not add instrumentation or a collector. Lifecycle and Queue operations are independent of metrics collection.
+
+The SDK depends on the reusable `org.apache.bifromq.tenon:tenon-process-metrics` artifact under `sdk/java/process-metrics` and pins and shades its private OpenTelemetry API, SDK and binary converter. The [process-metrics contract](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/sdk/process-metrics.md) defines CPU/RSS sampling; the library can also be used independently. It uses a separate gRPC channel with asynchronous callbacks and scheduled stream reconnection; it does not register a global provider or expose OTel types to Plugin authors.

@@ -26,8 +26,8 @@ Keep generated code easy to understand. Use the SDK's public API and the shared 
 
 ## Implementation details
 
-- [Rust scaffold](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/sdk/rust/rust-plugin-scaffold/README.md) — templates and generation options.
-- [cargo-tenon](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/sdk/rust/cargo-tenon/README.md) — Rust packaging tool.
-- [Java SDK and archetype](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/sdk/java/README.md) — project generation and Maven packaging.
-- [SDK and packaging contract](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/sdk/SDK-impl-contract.md) — required behavior and package validation.
-- [Plugin manifest schema](https://github.com/apache/bifromq-tenon/blob/21452dc53be3491567dbe9958294e34bf0fc79f5/contracts/plugin/manifest.schema.json) — manifest fields and constraints.
+- [Rust scaffold](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/sdk/rust/rust-plugin-scaffold/README.md) — templates and generation options.
+- [cargo-tenon](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/sdk/rust/cargo-tenon/README.md) — Rust packaging tool.
+- [Java SDK and archetype](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/sdk/java/README.md) — project generation and Maven packaging.
+- [SDK and packaging contract](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/sdk/plugin-sdk-contract.md) — required behavior and package validation.
+- [Plugin manifest schema](https://github.com/apache/bifromq-tenon/blob/d1848739c16373f5a150258fccd4475c0ef67992/contracts/plugin/manifest.schema.json) — manifest fields and constraints.

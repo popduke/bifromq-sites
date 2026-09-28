@@ -32,7 +32,7 @@ Choose the target matching the Runner and install the local bundle with `POST /p
 
 ## Payloads
 
-The Source payload contains `message.topic`, binary `message.body`, optional QoS and retain values, the DUP flag, and the receive timestamp. The Sink payload contains a `message` with topic, body, and optional QoS/retain values. The exact proto definitions are in the [source repository](https://github.com/apache/bifromq-tenon/tree/21452dc53be3491567dbe9958294e34bf0fc79f5/plugin/bifromq-tenon-mqtt-plugin/proto).
+The Source payload contains `message.topic`, binary `message.body`, optional QoS and retain values, the DUP flag, and the receive timestamp. The Sink payload contains a `message` with topic, body, and optional QoS/retain values. The exact proto definitions are in the [source repository](https://github.com/apache/bifromq-tenon/tree/d1848739c16373f5a150258fccd4475c0ef67992/plugin/bifromq-tenon-mqtt-plugin/proto).
 
 For a Source-to-Sink pass-through, bind both interfaces and use the exact Sink contract:
 
@@ -53,4 +53,4 @@ Use `:` for all Builder calls. QoS and reconnect behavior can produce duplicates
 
 ## Build and install
 
-The complete schema and package details are maintained in the [Tenon source tree](https://github.com/apache/bifromq-tenon/tree/21452dc53be3491567dbe9958294e34bf0fc79f5/plugin/bifromq-tenon-mqtt-plugin). Install through the normal Runner API; do not edit the Runner's private state directory.
+The complete schema and package details are maintained in the [Tenon source tree](https://github.com/apache/bifromq-tenon/tree/d1848739c16373f5a150258fccd4475c0ef67992/plugin/bifromq-tenon-mqtt-plugin). Install through the normal Runner API; do not edit the Runner's private state directory.
